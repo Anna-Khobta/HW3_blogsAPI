@@ -35,7 +35,7 @@ export const blogsRepository = {
             name: name,
             description: description,
             websiteUrl: websiteUrl,
-            createdAt: (new Date()).toString(),
+            createdAt: (new Date()).toISOString(),
             isMembership: true
         }
 

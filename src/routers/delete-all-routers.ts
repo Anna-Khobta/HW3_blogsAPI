@@ -18,11 +18,3 @@ deleteAllRouter.delete('/testing/all-data',
     })
 
 
-/*
-let arr: any[]  = []
-deleteAllRouter.delete('/testing/all-data', (req: Request, res: Response ) => {
-    arr = []
-    res.status(204).send('All data is deleted')
-})
-*/
-
