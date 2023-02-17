@@ -13,7 +13,7 @@ const port = process.env.PORT || 3000
 app.use(express.json())
 
 app.get('/', (req: Request, res: Response ) => {
-    let helloMessage = 'Hello Incubator11!!!'
+    let helloMessage = 'Hello Samurai!!!'
     res.send(helloMessage)
 })
 
