@@ -1,4 +1,4 @@
-import {blogsCollection, BlogType} from "./db";
+import {blogsCollection, BlogType, postsCollection} from "./db";
 
 
 // const __products: ProductType[] = [{id: 1, title: 'tomato'}, {id: 2, title: 'orange'}]
@@ -30,7 +30,7 @@ export const blogsRepository = {
 
 
     async createBlog(name: string,
-                         description: string, websiteUrl: string): Promise<BlogType> {
+                         description: string, websiteUrl: string): Promise<BlogType | null> {
         const newBlog= {
             id: (+(new Date())).toString(),
             name: name,
@@ -40,9 +40,11 @@ export const blogsRepository = {
             isMembership: false
         }
 
-        const result = await blogsCollection.insertOne(newBlog)
+        const insertNewBlogInDb = await blogsCollection.insertOne(newBlog)
 
-        return newBlog
+        const newBlogWithoughtID = await blogsCollection.findOne({id: newBlog.id},{projection:{_id:0}})
+
+        return newBlogWithoughtID
     },
 
 
