@@ -33,7 +33,7 @@ blogsRouter.post('/blogs',
     inputValidationMiddleware,
     async (req: Request, res: Response ) => {
 
-        const newBlog = await blogsRepository.createProduct(req.body.name, req.body.description, req.body.websiteUrl )
+        const newBlog = await blogsRepository.createBlog(req.body.name, req.body.description, req.body.websiteUrl )
         res.status(201).send(newBlog)
     }
 )
@@ -47,7 +47,7 @@ blogsRouter.put('/blogs/:id',
     inputValidationMiddleware,
     async (req: Request, res:Response) => {
 
-        const isUpdated = await blogsRepository.updateProduct(((+req.params.id).toString()), req.body.name, req.body.description, req.body.websiteUrl )
+        const isUpdated = await blogsRepository.updateBlog(((+req.params.id).toString()), req.body.name, req.body.description, req.body.websiteUrl )
         if (isUpdated) {
             // const blog = await blogsRepository.findBlogById(req.params.id)
             res.sendStatus(204)

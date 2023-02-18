@@ -4,12 +4,35 @@ import {authorizationMiddleware} from "../middlewares/authorization";
 import {inputValidationMiddleware} from "../middlewares/input-validation-middleware";
 
 import {titleValidation, shortDescriptionValidation, contentValidation, idValidation} from "../middlewares/posts-validations";
+import {postsRepositories} from "../repositories/posts-db-repositories";
+import {blogsRepository} from "../repositories/blogs-db-repositories";
+import {blogsRouter} from "./blogs-router";
 
-import {blogs} from "./blogs-router";
+//import {blogs} from "./blogs-router";
+//export let posts: PostType = []
 
 export const postsRouter = Router({})
 
-export let posts: any[] = []
+
+postsRouter.get('/posts',
+    async (req: Request, res: Response ) => {
+    let foundPosts = await postsRepositories.findPosts(req.query.title?.toString())
+        res.status(200).send(foundPosts)
+    })
+
+
+postsRouter.get('/posts/:id', async (req: Request, res: Response ) => {
+
+    let findPostID = await postsRepositories.findPostById(req.params.id)
+
+    if (findPostID) {
+        return res.status(200).send(findPostID)
+    } else {
+        return res.send(404)
+    }
+
+})
+
 
 postsRouter.post('/posts',
     authorizationMiddleware,
@@ -18,47 +41,18 @@ postsRouter.post('/posts',
     shortDescriptionValidation,
     contentValidation,
     inputValidationMiddleware,
-    (req: Request, res: Response ) => {
-
-        let findBlogID = blogs.find(p => +p.id === +(req.body.blogId)) // вынести отдельно строку? повторяется!
-
-        if (findBlogID) {
-            const newPost = {
-                id: (+(new Date())).toString(),
-                title: req.body.title,
-                shortDescription: req.body.shortDescription,
-                content: req.body.content,
-                blogId: req.body.blogId,
-                blogName: findBlogID?.name!
-
-            }
-            posts.push(newPost)
-            res.status(201).send(newPost)
-        } else {
-            return res.send(404)
-
-        }
-    })
+    async (req: Request, res: Response ) => {
 
 
-postsRouter.get('/posts',
-    (req: Request, res: Response ) => {
-        res.status(200).send(posts)
-    })
+        const newPostWithoughtID = await postsRepositories.createPost(req.body.title,
+            req.body.shortDescription, req.body.content, req.body.blogId )
 
-
-postsRouter.get('/posts/:id', (req: Request, res: Response ) => {
-
-    let findPostID = posts.find(p => +p.id === +req.params.id)
-
-        if (findPostID) {
-            return res.status(200).send(findPostID)
+        if (newPostWithoughtID) {
+            res.status(201).send(newPostWithoughtID)
         } else {
             return res.send(404)
         }
-
-})
-
+    })
 
 postsRouter.put('/posts/:id',
     authorizationMiddleware,
@@ -67,45 +61,33 @@ postsRouter.put('/posts/:id',
     shortDescriptionValidation,
     contentValidation,
     inputValidationMiddleware,
-    (req: Request, res:Response) => {
+    async (req: Request, res:Response) => {
 
-        let findBlogID = blogs.find(p => +p.id === +(req.body.blogId) )
+    const updatedPosWithoughtID = await postsRepositories.updatePost(req.body.title,
+        req.body.shortDescription, req.body.content, req.body.blogId )
 
-        let findUpdatedPost = posts.find(p => +p.id === +req.params.id)
+        if (updatedPosWithoughtID) {
+            res.status(201).send(updatedPosWithoughtID)
 
-        if (findBlogID) {
-            if (findUpdatedPost) {
-                findUpdatedPost.id = (+req.params.id).toString(),
-                    findUpdatedPost.title = req.body.title,
-                    findUpdatedPost.shortDescription = req.body.shortDescription,
-                    findUpdatedPost.content = req.body.content,
-                    findUpdatedPost.blogId = req.body.blogId,
-                    findUpdatedPost.blogName = findBlogID.name
+            // должно быть 204! оставвила для теста
 
-                posts.push(findUpdatedPost)
-                res.sendStatus(204)
-            }
+        } else {
+            return res.send(404)
         }
-        return res.sendStatus(404)
-        }
-)
+    })
 
 
-postsRouter.delete('/posts/:id',
+
+postsRouter.delete('/blogs/:id',
     authorizationMiddleware,
-    (req: Request, res: Response ) => {
+    async (req: Request, res: Response ) => {
 
-        let findPostID = posts.find(p => +p.id === +req.params.id)
+        const isDeleted = await postsRepositories.deletePost(req.params.id)
 
-            if (findPostID) {
-                for (let i = 0; i < posts.length; i++) {
-                    if (+posts[i].id === +req.params.id) {
-                        posts.splice(i, 1);
-                        res.send(204)
-                        return;
-                    }
-                }
-            }
-    res.send(404)
-})
+        if (isDeleted) {
+            res.send(204)
+        } else {
+            res.send(404)
+        }
+    })
 

@@ -3,7 +3,7 @@ import {blogsCollection, BlogType} from "./db";
 
 // const __products: ProductType[] = [{id: 1, title: 'tomato'}, {id: 2, title: 'orange'}]
 
-export let blogs: BlogType[] = []
+//export let blogs: BlogType[] = []
 
 export const blogsRepository = {
     async findBlogs(title: string | null | undefined): Promise<BlogType[]> {
@@ -28,7 +28,8 @@ export const blogsRepository = {
     },
 
 
-    async createProduct(name: string,
+
+    async createBlog(name: string,
                          description: string, websiteUrl: string): Promise<BlogType> {
         const newBlog= {
             id: (+(new Date())).toString(),
@@ -45,7 +46,7 @@ export const blogsRepository = {
     },
 
 
-    async updateProduct(id: string, name: string, description: string, websiteUrl: string ): Promise<boolean> {
+    async updateBlog(id: string, name: string, description: string, websiteUrl: string ): Promise<boolean> {
 
         const result = await blogsCollection.updateOne({id: id}, {$set: {name: name, description:description, websiteUrl:websiteUrl  }})
         return result.matchedCount === 1
