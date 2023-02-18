@@ -67,7 +67,7 @@ postsRouter.put('/posts/:id',
         req.body.shortDescription, req.body.content, req.body.blogId )
 
         if (updatedPosWithoughtID) {
-            res.status(204).send(updatedPosWithoughtID)
+            res.send(204)
 
             // должно быть 204! оставвила для теста
 
