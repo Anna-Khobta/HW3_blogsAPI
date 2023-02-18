@@ -45,28 +45,33 @@ export const postsRepositories = {
     return newPostWithoughtID
 }},
 
-    async updatePost(title: string, shortDescription: string, content: string,
+    async updatePost(id: string, title: string, shortDescription: string, content: string,
                      blogId: string): Promise<PostType | undefined | null> {
+
+        let foundPostId = await postsCollection.findOne({id:id})
 
         let foundBlogName = await blogsCollection.findOne({id: blogId}, {projection: {_id: 0}})
 
-        if (foundBlogName) {
+        if (foundPostId) {
+            if (foundBlogName) {
 
-            const updatedPost = {
-                id: (+(new Date())).toString(),
-                title: title,
-                shortDescription: shortDescription,
-                content: content,
-                blogId: blogId,
-                blogName: foundBlogName.name,
-                createdAt: (new Date()).toISOString(),
+                const updatedPost = {
+                    id: (+(new Date())).toString(),
+                    title: title,
+                    shortDescription: shortDescription,
+                    content: content,
+                    blogId: blogId,
+                    blogName: foundBlogName.name,
+                    createdAt: (new Date()).toISOString(),
+                }
+                const updatedPostInDb = await postsCollection.insertOne(updatedPost)
+
+                const updatedPosWithoughtID = await postsCollection.findOne({id: updatedPost.id},{projection:{_id:0}})
+
+                return updatedPosWithoughtID
             }
-            const updatedPostInDb = await postsCollection.insertOne(updatedPost)
-
-            const updatedPosWithoughtID = await postsCollection.findOne({id: updatedPost.id},{projection:{_id:0}})
-
-            return updatedPosWithoughtID
-        }},
+        }
+        },
 
 
     async deletePost(id: string): Promise<boolean> {

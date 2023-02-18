@@ -63,7 +63,7 @@ postsRouter.put('/posts/:id',
     inputValidationMiddleware,
     async (req: Request, res:Response) => {
 
-    const updatedPosWithoughtID = await postsRepositories.updatePost(req.body.title,
+    const updatedPosWithoughtID = await postsRepositories.updatePost(req.params.id, req.body.title,
         req.body.shortDescription, req.body.content, req.body.blogId )
 
         if (updatedPosWithoughtID) {
@@ -78,7 +78,7 @@ postsRouter.put('/posts/:id',
 
 
 
-postsRouter.delete('/blogs/:id',
+postsRouter.delete('/posts/:id',
     authorizationMiddleware,
     async (req: Request, res: Response ) => {
 
