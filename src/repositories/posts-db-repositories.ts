@@ -46,32 +46,40 @@ export const postsRepositories = {
 }},
 
     async updatePost(id: string, title: string, shortDescription: string, content: string,
-                     blogId: string): Promise<PostType | undefined | null> {
+                     blogId: string): Promise<boolean | undefined> {
 
-        let foundPostId = await postsCollection.findOne({id:id})
+        let foundPostId = await postsCollection.findOne({id: id})
 
         let foundBlogName = await blogsCollection.findOne({id: blogId}, {projection: {_id: 0}})
 
         if (foundPostId) {
             if (foundBlogName) {
+                const updatedPost = await postsCollection.updateOne({id: id},
+                    {$set: {title: title, shortDescription: shortDescription, content: content}})
 
-                const updatedPost = {
-                    id: (+(new Date())).toString(),
-                    title: title,
-                    shortDescription: shortDescription,
-                    content: content,
-                    blogId: blogId,
-                    blogName: foundBlogName.name,
-                    createdAt: (new Date()).toISOString(),
-                }
-                const updatedPostInDb = await postsCollection.insertOne(updatedPost)
-
-                const updatedPosWithoughtID = await postsCollection.findOne({id: updatedPost.id},{projection:{_id:0}})
-
-                return updatedPosWithoughtID
+                return updatedPost.matchedCount === 1
             }
         }
-        },
+    },
+
+                // если совпал 1, то обвновился 1
+                // const updatedPost = {
+                //     id: (+(new Date())).toString(),
+                //     title: title,
+                //     shortDescription: shortDescription,
+                //     content: content,
+                //     blogId: blogId,
+                //     blogName: foundBlogName.name,
+                //     createdAt: (new Date()).toISOString(),
+                // }
+/*
+
+                const updatedPostInDb = await postsCollection.insertOne(updatedPost)
+                const updatedPosWithoughtID = await postsCollection.findOne({id: updatedPost.id},{projection:{_id:0}})
+                return updatedPosWithoughtID*/
+
+
+
 
 
     async deletePost(id: string): Promise<boolean> {
